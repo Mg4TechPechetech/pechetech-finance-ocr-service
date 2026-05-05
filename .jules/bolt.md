@@ -1,0 +1,3 @@
+## 2024-05-24 - Async CPU-Bound execution and dependency caching in FastAPI ML Services
+**Learning:** In FastAPI applications integrating ML models (like our OCR and NLP engines), synchronous CPU-bound operations (like `use_case.execute()`) block the main event loop, significantly degrading concurrency. Additionally, repeatedly instantiating expensive engines on every request adds unnecessary overhead.
+**Action:** Always offload synchronous CPU-bound ML executions using `asyncio.to_thread`. Also, cache dependency injections for heavy services (like ML engines) using `@lru_cache()` to instantiate them only once.
