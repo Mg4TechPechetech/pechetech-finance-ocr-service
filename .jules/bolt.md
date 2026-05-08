@@ -1,3 +1,3 @@
-## 2024-05-24 - FastAPI ML Engine Dependency Injection & CPU-Bound Operations
-**Learning:** In FastAPI applications integrating ML models (like OCR or NLP engines), instantiating these models per-request blocks the event loop and wastes memory/CPU. Furthermore, executing these CPU-bound tasks in async routes directly blocks concurrent requests.
-**Action:** Always cache the instantiation of ML components injected via dependency injection using `@lru_cache()` from `functools`. Always offload the execution of these synchronous CPU-bound models using `await asyncio.to_thread(func)`.
+## 2024-05-02 - Unblocking FastAPI Event Loop from Synchronous ML Tasks
+**Learning:** Mixing synchronous, heavy CPU-bound operations (like OpenCV pre-processing or ML model inference) inside an `async def` FastAPI route blocks the underlying asyncio event loop, preventing the server from handling concurrent requests.
+**Action:** Always wrap heavy synchronous `use_case` executions in `await run_in_threadpool()` (from `starlette.concurrency`) or use a simple `def` route if the entire request handling is synchronous. Since `await file.read()` is asynchronous, `run_in_threadpool` is the optimal solution to mix async file I/O with sync ML processing.
