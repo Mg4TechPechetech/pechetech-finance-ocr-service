@@ -1,3 +1,5 @@
+import asyncio
+from functools import lru_cache
 from fastapi import APIRouter, UploadFile, File, Depends
 from starlette.concurrency import run_in_threadpool
 from src.use_cases.extract_receipt_data_use_case import ExtractReceiptDataUseCase
@@ -8,6 +10,7 @@ from src.presentation.dtos.extraction_response import ExtractionResponseDTO
 router = APIRouter(prefix="/api/v1/ocr", tags=["OCR"])
 
 # Dependency Injection
+@lru_cache()
 def get_extract_use_case():
     ocr_engine = DummyOCREngine()
     nlp_engine = DummyNLPEngine()
