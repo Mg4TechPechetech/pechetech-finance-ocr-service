@@ -1,4 +1,5 @@
 from fastapi import APIRouter, UploadFile, File, Depends
+from starlette.concurrency import run_in_threadpool
 from src.use_cases.extract_receipt_data_use_case import ExtractReceiptDataUseCase
 from src.infrastructure.engines.dummy_ocr_engine import DummyOCREngine
 from src.infrastructure.engines.dummy_nlp_engine import DummyNLPEngine
@@ -19,8 +20,9 @@ async def extract_receipt(
 ):
     image_bytes = await file.read()
     
-    # Execute Use Case
-    result = use_case.execute(image_bytes)
+    # Execute Use Case (Offloaded to threadpool to avoid blocking event loop)
+    # ⚡ Bolt: Offloading synchronous, CPU-intensive ML/OCR operations to a background thread
+    result = await run_in_threadpool(use_case.execute, image_bytes)
     
     # Map to DTO
     return ExtractionResponseDTO(
