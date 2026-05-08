@@ -1,0 +1,3 @@
+## 2024-05-07 - FastAPI ML Optimization Pattern
+**Learning:** In FastAPI applications integrating ML models, synchronous CPU-bound operations (like OCR or NLP analysis) can block the asynchronous event loop, leading to poor performance and degraded throughput. Instantiating models on every request is also an expensive bottleneck.
+**Action:** Always cache dependency injections using `@lru_cache()` for expensive components like ML engines. Furthermore, offload synchronous CPU-bound execution using `asyncio.to_thread` to prevent blocking the event loop and ensure the application remains responsive.
