@@ -2,17 +2,17 @@ import asyncio
 from functools import lru_cache
 from fastapi import APIRouter, UploadFile, File, Depends
 from src.use_cases.extract_receipt_data_use_case import ExtractReceiptDataUseCase
-from src.infrastructure.engines.dummy_ocr_engine import DummyOCREngine
-from src.infrastructure.engines.dummy_nlp_engine import DummyNLPEngine
+from src.infrastructure.engines.tesseract_ocr_engine import TesseractOCREngine
+from src.infrastructure.engines.simple_nlp_engine import SimpleNLPEngine
 from src.presentation.dtos.extraction_response import ExtractionResponseDTO
 
-router = APIRouter(prefix="/api/v1/ocr", tags=["OCR"])
+router = APIRouter(tags=["OCR"])
 
 # Dependency Injection
 @lru_cache()  # Cache DI to avoid instantiating ML models per request
 def get_extract_use_case():
-    ocr_engine = DummyOCREngine()
-    nlp_engine = DummyNLPEngine()
+    ocr_engine = TesseractOCREngine()
+    nlp_engine = SimpleNLPEngine()
     return ExtractReceiptDataUseCase(ocr_engine, nlp_engine)
 
 @router.post("/extract", response_model=ExtractionResponseDTO)
