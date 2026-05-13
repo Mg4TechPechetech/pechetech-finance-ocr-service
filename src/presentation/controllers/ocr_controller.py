@@ -8,22 +8,26 @@ from functools import lru_cache
 import asyncio
 >>>>>>> origin/bolt-optimize-fastapi-ml-7961076887713795024
 from src.use_cases.extract_receipt_data_use_case import ExtractReceiptDataUseCase
-from src.infrastructure.engines.dummy_ocr_engine import DummyOCREngine
-from src.infrastructure.engines.dummy_nlp_engine import DummyNLPEngine
+from src.infrastructure.engines.tesseract_ocr_engine import TesseractOCREngine
+from src.infrastructure.engines.simple_nlp_engine import SimpleNLPEngine
 from src.presentation.dtos.extraction_response import ExtractionResponseDTO
 
-router = APIRouter(prefix="/api/v1/ocr", tags=["OCR"])
+router = APIRouter(tags=["OCR"])
 
 # Dependency Injection
+<<<<<<< HEAD
 <<<<<<< HEAD
 =======
 # ⚡ BOLT OPTIMIZATION: Cache the dependency injection to prevent re-instantiating
 # expensive OCR/NLP engines on every request.
 >>>>>>> origin/bolt-optimize-fastapi-ml-7961076887713795024
 @lru_cache()
+=======
+@lru_cache()  # Cache DI to avoid instantiating ML models per request
+>>>>>>> fastapi-ml-optimization-10819511585730887981
 def get_extract_use_case():
-    ocr_engine = DummyOCREngine()
-    nlp_engine = DummyNLPEngine()
+    ocr_engine = TesseractOCREngine()
+    nlp_engine = SimpleNLPEngine()
     return ExtractReceiptDataUseCase(ocr_engine, nlp_engine)
 
 @router.post("/extract", response_model=ExtractionResponseDTO)
@@ -34,6 +38,7 @@ async def extract_receipt(
     image_bytes = await file.read()
     
 <<<<<<< HEAD
+<<<<<<< HEAD
     # Execute Use Case (Offloaded to threadpool to avoid blocking event loop)
     # ⚡ Bolt: Offloading synchronous, CPU-intensive ML/OCR operations to a background thread
     result = await run_in_threadpool(use_case.execute, image_bytes)
@@ -43,6 +48,10 @@ async def extract_receipt(
     # CPU-bound ML extraction process outside of the main event loop thread.
     result = await asyncio.to_thread(use_case.execute, image_bytes)
 >>>>>>> origin/bolt-optimize-fastapi-ml-7961076887713795024
+=======
+    # Execute Use Case offloaded to thread to avoid blocking event loop
+    result = await asyncio.to_thread(use_case.execute, image_bytes)
+>>>>>>> fastapi-ml-optimization-10819511585730887981
     
     # Map to DTO
     return ExtractionResponseDTO(
